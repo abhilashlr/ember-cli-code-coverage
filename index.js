@@ -57,7 +57,8 @@ module.exports = {
       isAddon: this.project.isEmberCLIAddon(),
       useBabelInstrumenter: useBabelInstrumenter,
       babelPlugins: babelPlugins,
-      templateExtensions: this.registry.extensionsForType('template')
+      templateExtensions: this.registry.extensionsForType('template'),
+      isModuleUnificationApp: this._isModuleUnificationApp()
     });
 
     return new BroccoliMergeTrees([tree, instrumentedNode], { overwrite: true });
@@ -90,7 +91,8 @@ module.exports = {
    * @returns {Boolean} whether or not the file exists within the current app
    */
   _doesFileExistInCurrentProjectApp: function(relativePath) {
-    relativePath = path.join('app', relativePath);
+    var root = this._isModuleUnificationApp() ? '' : 'app';
+    relativePath = path.join(root, relativePath);
 
     if (this._existsSync(relativePath)) {
       return true;
@@ -257,5 +259,9 @@ module.exports = {
     }
 
     return this._coveredAddon;
+  },
+
+  _isModuleUnificationApp: function() {
+    return this.project && this.project.isModuleUnification && this.project.isModuleUnification()
   }
 };
